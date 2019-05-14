@@ -318,6 +318,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //==============================================================================================
     private void setupImageReader() {
         //2代表ImageReader中最多可以获取两帧图像流
         mImageReader = ImageReader.newInstance(mCaptureSize.getWidth(), mCaptureSize.getHeight(),
