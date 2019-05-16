@@ -16,11 +16,15 @@ public class FileUtil {
     @SuppressLint("SdCardPath")
     public static void saveBitmap(Bitmap bitmap, String bitName) {
         File appDir = new File(Environment.getExternalStorageDirectory()+"/"+"smartPhoneCamera", "Images");
+
+        /**创建文件*/
         if (!appDir.exists()) {
             appDir.mkdir();
         }
-        File file = new File(appDir, bitName);     // 创建文件
-        try {                                       // 写入图片
+
+        /**写入图片*/
+        File file = new File(appDir, bitName);
+        try {
             FileOutputStream fos = new FileOutputStream(file);
             Bitmap endBit = Bitmap.createScaledBitmap(bitmap, 720, 1280, true); //创建新的图像大小
             endBit.compress(Bitmap.CompressFormat.JPEG, 100, fos);
