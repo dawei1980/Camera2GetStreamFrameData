@@ -35,7 +35,6 @@ import android.widget.Toast;
 
 import com.stream.frame.R;
 import com.stream.frame.utils.ImageUtil;
-import com.stream.frame.utils.ImageUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;

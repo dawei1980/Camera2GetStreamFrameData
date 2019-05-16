@@ -57,13 +57,10 @@ public class Camera2TestActivity extends AppCompatActivity implements TextureVie
     private String mCameraId = "0"; // gu 0: back 1: front camera
 
     public byte[] mImageBytes;
-    public int mImageWidth;
-    public int mImageHeight;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static int mSensorOrientation;
     private static int PREVIEW_WIDTH = 1280;
     private static int PREVIEW_HEIGHT = 720;
-    public static boolean isNeedDataByte = true;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -195,11 +192,6 @@ public class Camera2TestActivity extends AppCompatActivity implements TextureVie
             return;
         }
 
-//        int widthPx = DensityUtils.dip2px(this, 200);
-//        int radius = widthPx / 2;
-//        mPreviewView.setOutlineProvider(new TextureViewOutlineProvider(radius));
-//        mPreviewView.setClipToOutline(true);
-
         SurfaceTexture texture = mPreviewView.getSurfaceTexture();
 
 //      这里设置的就是预览大小
@@ -256,7 +248,7 @@ public class Camera2TestActivity extends AppCompatActivity implements TextureVie
         }
     };
 
-    private void updatePreview() throws CameraAccessException {
+    private void updatePreview() {
         if (mHandler == null) return;
         mHandler.post(new Runnable() {
             @SuppressLint("NewApi")
