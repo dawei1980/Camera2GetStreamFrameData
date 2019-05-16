@@ -35,6 +35,7 @@ import android.view.Surface;
 import android.view.TextureView;
 
 import com.stream.frame.R;
+import com.stream.frame.utils.FileUtil;
 import com.stream.frame.utils.ImageUtil;
 
 import java.io.BufferedOutputStream;
@@ -290,7 +291,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             String picture_name = pic_name + ".jpg";
             System.out.println(picture_name);
 
-            saveBitmap(bitmap2, picture_name);
+            FileUtil.saveBitmap(bitmap2, picture_name);
 
             pic_name = pic_name + 1;
             System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssss");
@@ -298,28 +299,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             image.close();
         }
     };
-
-    //新添加的保存到手机的方法
-    @SuppressLint("SdCardPath")
-    private void saveBitmap(Bitmap bitmap, String bitName) {
-        File appDir = new File(Environment.getExternalStorageDirectory()+"/"+"smartPhoneCamera", "Images");
-        if (!appDir.exists()) {
-            appDir.mkdir();
-        }
-        File file = new File(appDir, bitName);     // 创建文件
-        try {                                       // 写入图片
-            FileOutputStream fos = new FileOutputStream(file);
-            Bitmap endBit = Bitmap.createScaledBitmap(bitmap, 720, 1280, true); //创建新的图像大小
-            endBit.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-            fos.close();
-            endBit.recycle();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void onPause() {
