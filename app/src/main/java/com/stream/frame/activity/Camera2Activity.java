@@ -296,6 +296,12 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             pic_name = pic_name + 1;
             System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssss");
 
+            // 先判断是否已经回收
+            if(bitmap2 != null && !bitmap2.isRecycled()){
+                // 回收并且置为null
+                bitmap2.recycle();
+            }
+            System.gc();
             image.close();
         }
     };
@@ -303,7 +309,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     @Override
     public void onPause() {
         super.onPause();
-
         closeCamera();
     }
 
