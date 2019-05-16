@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class FileUtil {
 
-    //新添加的保存到手机的方法
+    /**新添加的保存到手机的方法*/
     @SuppressLint("SdCardPath")
     public static void saveBitmap(Bitmap bitmap, String bitName) {
         File appDir = new File(Environment.getExternalStorageDirectory()+"/"+"smartPhoneCamera", "Images");
