@@ -34,6 +34,7 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 
+import com.ai.tensorflow.personTracking.PersonTrackerImpl;
 import com.stream.frame.R;
 import com.stream.frame.utils.FileUtil;
 import com.stream.frame.utils.ImageUtil;
@@ -69,6 +70,14 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
     private int pic_name = 1;
 
+    //==============================================================================================
+    private String sdcard =  Environment.getExternalStoragePublicDirectory("")+"";
+    // param
+    private String rootPath = sdcard + File.separator + "tensorflow-lite-demo/tracking";
+    private String logFolder = rootPath +  File.separator + "log";   //the path to save log file
+    private PersonTrackerImpl personTracker;
+    //==============================================================================================
+
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
@@ -89,6 +98,12 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     public void onResume() {
         super.onResume();
         Log.e(TAG, "onResume: ----camera fragment resume");
+
+        //===============================================================
+        /**创建AI识别*/
+        personTracker = new PersonTrackerImpl(logFolder);
+        personTracker.createPersonTracker(getAssets());
+        //===============================================================
 
         mImageBytes = null;
 
@@ -214,10 +229,9 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
          * 此处还有很多格式，比如我所用到YUV等
          * 最大的图片数，mImageReader里能获取到图片数，但是实际中是2+1张图片，就是多一张,"30"代表每秒取30帧的图片
          * */
-        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 30);
+        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 100);
 
         mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mHandler);
-
 
         mPreviewBuilder.set(CaptureRequest.JPEG_ORIENTATION, 0);
 
@@ -288,6 +302,10 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
                     imageWidth, imageHeight,
                     android.graphics.Bitmap.Config.ARGB_8888);
 
+            //================================================================================
+            personTracker.personStreamDetect(bitmap2);
+            //================================================================================
+
             String picture_name = pic_name + ".jpg";
             System.out.println(picture_name);
 
@@ -303,6 +321,12 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             }
             System.gc();
             image.close();
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     };
 
@@ -336,6 +360,10 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         }
 
         stopBackgroundThread();
+
+        //=============================================================
+        personTracker.closePersonTracker();
+        //=============================================================
     }
 
     private void stopBackgroundThread() {
