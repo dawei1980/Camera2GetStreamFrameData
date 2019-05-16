@@ -56,7 +56,9 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     private ImageReader mImageReader;
     private static CameraDevice mCameraDevice;
     private CameraCaptureSession mCaptureSession;
-    private String mCameraId = "0"; // gu 0: back 1: front camera
+
+    /**gu 0: back 1: front camera*/
+    private String mCameraId = "0";
 
     public byte[] mImageBytes;
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -95,10 +97,9 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         } else {
             mPreviewView.setSurfaceTextureListener(this);
         }
-
     }
 
-    //很多过程都变成了异步的了，所以这里需要一个子线程的looper
+    /**很多过程都变成了异步的了，所以这里需要一个子线程的looper*/
     private void startBackgroundThread() {
         mHandlerThread = new HandlerThread(Camera2Activity.class.getName());
         mHandlerThread.start();
@@ -120,24 +121,21 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         return false;
     }
 
-    // 这个方法要注意一下，因为每有一帧画面，都会回调一次此方法
+    /**这个方法要注意一下，因为每有一帧画面，都会回调一次此方法*/
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
     }
 
-
+    /**打开相机*/
     private void openCamera(int width, int height) {
         try {
-            //获得所有摄像头的管理者CameraManager
+            /**获得所有摄像头的管理者CameraManager*/
             CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-            //获得某个摄像头的特征，支持的参数
+            /**获得某个摄像头的特征，支持的参数*/
             CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(mCameraId);
             //支持的STREAM CONFIGURATION
-
             mPreviewSize = new Size(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-
-            //打开相机
             mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             Log.e(TAG, "openCamera: ----mSensorOrientation:" + mSensorOrientation);
 
@@ -169,7 +167,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             }
         }
 
-
         @Override
         public void onDisconnected(CameraDevice camera) {
             camera.close();
@@ -189,7 +186,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         }
     };
 
-    // 开始预览，主要是camera.createCaptureSession这段代码很重要，创建会话
+    /**开始预览，主要是camera.createCaptureSession这段代码很重要，创建会话*/
     private void startPreview(CameraDevice camera) throws CameraAccessException {
 
         if (null == mCameraDevice) {
@@ -198,29 +195,32 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
         SurfaceTexture texture = mPreviewView.getSurfaceTexture();
 
-//      这里设置的就是预览大小
+        /**这里设置的就是预览大小*/
         texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
         Surface surface = new Surface(texture);
 
         try {
-            // 设置捕获请求为预览，这里还有拍照啊，录像等
+            /**设置捕获请求为预览，这里还有拍照啊，录像等*/
             mPreviewBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
 
-//      就是在这里，通过这个set(key,value)方法，设置曝光啊，自动聚焦等参数！！ 如下举例：
+        /**就是在这里，通过这个set(key,value)方法，设置曝光啊，自动聚焦等参数！！ 如下举例：*/
         mPreviewBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 
-        /*此处还有很多格式，比如我所用到YUV等*/
-        /*最大的图片数，mImageReader里能获取到图片数，但是实际中是2+1张图片，就是多一张*/
+        /**
+         * 此处还有很多格式，比如我所用到YUV等
+         * 最大的图片数，mImageReader里能获取到图片数，但是实际中是2+1张图片，就是多一张,"30"代表每秒取30帧的图片
+         * */
         mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 30);
 
         mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mHandler);
-        // 这里一定分别add两个surface，一个Textureview的，一个ImageReader的，如果没add，会造成没摄像头预览，或者没有ImageReader的那个回调！！
+
 
         mPreviewBuilder.set(CaptureRequest.JPEG_ORIENTATION, 0);
 
+        /**这里一定分别add两个surface，一个Textureview的，一个ImageReader的，如果没add，会造成没摄像头预览，或者没有ImageReader的那个回调！！*/
         mPreviewBuilder.addTarget(surface);
         mPreviewBuilder.addTarget(mImageReader.getSurface());
 
@@ -228,7 +228,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             return;
         }
         camera.createCaptureSession(Arrays.asList(surface, mImageReader.getSurface()), mSessionStateCallback, mHandler);
-
     }
 
     private CameraCaptureSession.StateCallback mSessionStateCallback = new CameraCaptureSession.StateCallback() {
@@ -297,8 +296,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssss");
 
             image.close();
-
-//            mHandler.post(new ImageSaver(reader));
         }
     };
 
@@ -324,70 +321,12 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         }
     }
 
-    //    private class ImageSaver implements Runnable {
-//
-//        ImageReader reader;
-//
-//        public ImageSaver(ImageReader reader) {
-//            this.reader = reader;
-//        }
-//
-//        @Override
-//        public void run() {
-//            if (mCameraDevice == null) {
-//                return;
-//            }
-//
-//            // get new data
-//            //if (isNeedDataByte) {
-//            Image image = reader.acquireLatestImage();
-//            if (image == null) {
-//                return;
-//            }
-//
-//            byte[] dataResult;
-//            int width = image.getWidth();
-//            int height = image.getHeight();
-//
-//                /*ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-//                dataResult = new byte[buffer.remaining()];
-//                buffer.get(dataResult);*/
-//            //byte[] data = ImageUtils.imageToByteArray(image);
-//            //byte[] data = ImageUtils.YUV_420_888toNV21(image);
-//
-//            if (reader.getSurface() != null && reader.getSurface().isValid()) {
-//
-//                byte[] data = ImageUtils.getDataFromImage(image, ImageUtils.COLOR_FormatNV21);
-//
-//                if (mSensorOrientation == 90) {
-//                    dataResult = ImageUtils.rotateYUV420Degree90(data, width, height);
-//                } else if (mSensorOrientation == 180) {
-//                    dataResult = ImageUtils.rotateYUV420Degree180(data, width, height);
-//                } else if (mSensorOrientation == 270) {
-//                    dataResult = ImageUtils.rotateYUV420Degree270(data, width, height);
-//                } else {
-//                    dataResult = data;
-//                }
-//
-//                mImageBytes = dataResult;
-//                Log.e(TAG, "run: ------ImageSaver image width:" + width + " height:" + height);
-//
-//                mImageWidth = height;
-//                mImageHeight = width;
-//
-//                isNeedDataByte = false; // 获取特征后停止再次提取
-//            }
-//            image.close();
-//        }
-//    }
-
     @Override
     public void onPause() {
         super.onPause();
 
         closeCamera();
     }
-
 
     private void closeCamera() {
 
@@ -414,7 +353,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
         stopBackgroundThread();
     }
-
 
     private void stopBackgroundThread() {
         try {
