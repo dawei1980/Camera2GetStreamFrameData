@@ -24,9 +24,12 @@ public class FileUtil {
             FileOutputStream fos = new FileOutputStream(file);
             Bitmap endBit = Bitmap.createScaledBitmap(bitmap, 720, 1280, true); //创建新的图像大小
             endBit.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+
+            if(!endBit.isRecycled()){
+                bitmap.recycle();
+            }
             fos.flush();
             fos.close();
-            endBit.recycle();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
