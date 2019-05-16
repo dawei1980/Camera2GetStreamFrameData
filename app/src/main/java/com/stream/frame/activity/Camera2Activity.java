@@ -214,7 +214,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
         /*此处还有很多格式，比如我所用到YUV等*/
         /*最大的图片数，mImageReader里能获取到图片数，但是实际中是2+1张图片，就是多一张*/
-        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 10);
+        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 30);
 
         mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mHandler);
         // 这里一定分别add两个surface，一个Textureview的，一个ImageReader的，如果没add，会造成没摄像头预览，或者没有ImageReader的那个回调！！
