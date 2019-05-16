@@ -39,7 +39,9 @@ import com.stream.frame.utils.ImageUtil;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -61,6 +63,8 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     private static int mSensorOrientation;
     private static int PREVIEW_WIDTH = 1280;
     private static int PREVIEW_HEIGHT = 720;
+
+    private int pic_name = 1;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -206,10 +210,11 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         }
 
 //      就是在这里，通过这个set(key,value)方法，设置曝光啊，自动聚焦等参数！！ 如下举例：
-//      mPreviewBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+        mPreviewBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 
-        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888/*此处还有很多格式，比如我所用到YUV等*/,
-                2/*最大的图片数，mImageReader里能获取到图片数，但是实际中是2+1张图片，就是多一张*/);
+        /*此处还有很多格式，比如我所用到YUV等*/
+        /*最大的图片数，mImageReader里能获取到图片数，但是实际中是2+1张图片，就是多一张*/
+        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 10);
 
         mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mHandler);
         // 这里一定分别add两个surface，一个Textureview的，一个ImageReader的，如果没add，会造成没摄像头预览，或者没有ImageReader的那个回调！！
@@ -278,42 +283,18 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
             byte[] data68 = ImageUtil.getBytesFromImageAsType(image,2);
 
-            int rgb[] = ImageUtil.decodeYUV420SP(data68, imageWidth, imageHeight);
+            int[] rgb = ImageUtil.decodeYUV420SP(data68, imageWidth, imageHeight);
             Bitmap bitmap2 = Bitmap.createBitmap(rgb, 0, imageWidth,
                     imageWidth, imageHeight,
                     android.graphics.Bitmap.Config.ARGB_8888);
-            try {
-                File newFile = new File(Environment.getExternalStorageDirectory(), "345.png");
-                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile));
-                bitmap2.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-                bos.flush();
-                bos.close();
-                bitmap2.recycle();
-            } catch (Exception e) {
 
-            }
+            String picture_name = pic_name + ".jpg";
+            System.out.println(picture_name);
 
-//            if(time==5) {
-//                int rgb[] = ImageUtil.decodeYUV420SP(data68, imageWidth, imageHeight);
-//                Bitmap bitmap2 = Bitmap.createBitmap(rgb, 0, imageWidth,
-//                        imageWidth, imageHeight,
-//                        android.graphics.Bitmap.Config.ARGB_8888);
-//                try {
-//                    File newFile = new File(Environment.getExternalStorageDirectory(), "345.png");
-//                    BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(newFile));
-//                    bitmap2.compress(Bitmap.CompressFormat.PNG, 100, bos);
-//                    bos.flush();
-//                    bos.close();
-//                    bitmap2.recycle();
-//                } catch (Exception e) {
-//
-//                }
-//            }
+            saveBitmap(bitmap2, picture_name);
 
-//            Message msg = Message.obtain();
-//            msg.obj = bitmap2;
-//            msg.what = 003;
-//            runHandler.sendMessage(msg);
+            pic_name = pic_name + 1;
+            System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssss");
 
             image.close();
 
@@ -321,8 +302,29 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         }
     };
 
+    //新添加的保存到手机的方法
+    @SuppressLint("SdCardPath")
+    private void saveBitmap(Bitmap bitmap, String bitName) {
+        File appDir = new File(Environment.getExternalStorageDirectory()+"/"+"smartPhoneCamera", "Images");
+        if (!appDir.exists()) {
+            appDir.mkdir();
+        }
+        File file = new File(appDir, bitName);     // 创建文件
+        try {                                       // 写入图片
+            FileOutputStream fos = new FileOutputStream(file);
+            Bitmap endBit = Bitmap.createScaledBitmap(bitmap, 720, 1280, true); //创建新的图像大小
+            endBit.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+            fos.close();
+            endBit.recycle();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-//    private class ImageSaver implements Runnable {
+    //    private class ImageSaver implements Runnable {
 //
 //        ImageReader reader;
 //
@@ -456,9 +458,4 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         }
         mPreviewView.setTransform(matrix);
     }
-
-    public boolean isCaptureSessionValid() {
-        return mCaptureSession != null;
-    }
-
 }
