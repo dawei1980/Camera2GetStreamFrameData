@@ -289,15 +289,12 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-
             Image image = reader.acquireLatestImage();
-
             int imageWidth = image.getWidth();
             int imageHeight = image.getHeight();
-
             byte[] data68 = ImageUtil.getBytesFromImageAsType(image,2);
-
             int[] rgb = ImageUtil.decodeYUV420SP(data68, imageWidth, imageHeight);
+
             Bitmap bitmap2 = Bitmap.createBitmap(rgb, 0, imageWidth,
                     imageWidth, imageHeight,
                     android.graphics.Bitmap.Config.ARGB_8888);
