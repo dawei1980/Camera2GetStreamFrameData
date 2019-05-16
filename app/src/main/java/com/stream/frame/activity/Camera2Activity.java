@@ -319,11 +319,11 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             System.gc();
             image.close();
 
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         }
     };
 
