@@ -93,8 +93,6 @@ public class ImageUtil {
                 }
             }
 
-            //   image.close();
-
             //根据要求的结果类型进行填充
             switch (type) {
                 case YUV420P:
