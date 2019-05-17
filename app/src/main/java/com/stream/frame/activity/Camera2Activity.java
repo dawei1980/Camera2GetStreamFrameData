@@ -93,6 +93,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
         //===============================================================
         /**创建AI识别*/
+        /**Create AI distinguish*/
         personTracker = new PersonTrackerImpl(logFolder);
         personTracker.createPersonTracker(getAssets());
         //===============================================================
@@ -201,6 +202,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     };
 
     /**开始预览，主要是camera.createCaptureSession这段代码很重要，创建会话*/
+    /**Start preview, The important code is camera.createCaptureSession,there are create session*/
     private void startPreview(CameraDevice camera) throws CameraAccessException {
 
         if (null == mCameraDevice) {
@@ -210,6 +212,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
         SurfaceTexture texture = mPreviewView.getSurfaceTexture();
 
         /**这里设置的就是预览大小*/
+        /**There is setting the size of preview*/
         texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
         Surface surface = new Surface(texture);
 
