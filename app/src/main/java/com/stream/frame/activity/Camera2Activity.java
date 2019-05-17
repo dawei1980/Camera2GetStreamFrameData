@@ -38,19 +38,17 @@ import com.ai.tensorflow.personTracking.PersonTrackerImpl;
 import com.stream.frame.R;
 import com.stream.frame.utils.FileUtil;
 import com.stream.frame.utils.ImageUtil;
+import com.stream.frame.view.AutoFitTextureView;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class Camera2Activity extends AppCompatActivity implements TextureView.SurfaceTextureListener{
     private static final String TAG = Camera2Activity.class.getSimpleName();
 
-    private TextureView mPreviewView;
+    private AutoFitTextureView mPreviewView;
     private Handler mHandler;
     private HandlerThread mHandlerThread;
     private Size mPreviewSize;
@@ -92,18 +90,18 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
         mPreviewView = findViewById(R.id.texture);
         Log.e(TAG, "onCreate: ------------------------------------");
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.e(TAG, "onResume: ----camera fragment resume");
 
         //===============================================================
         /**创建AI识别*/
         personTracker = new PersonTrackerImpl(logFolder);
         personTracker.createPersonTracker(getAssets());
         //===============================================================
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.e(TAG, "onResume: ----camera fragment resume");
 
         mImageBytes = null;
 
@@ -229,7 +227,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
          * 此处还有很多格式，比如我所用到YUV等
          * 最大的图片数，mImageReader里能获取到图片数，但是实际中是2+1张图片，就是多一张,"30"代表每秒取30帧的图片
          * */
-        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 50);
+        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 30);
 
         mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mHandler);
 
@@ -319,11 +317,11 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             System.gc();
             image.close();
 
-//            try {
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     };
 
