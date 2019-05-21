@@ -306,9 +306,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
             String picture_name = pic_name + ".jpg";
             System.out.println(picture_name);
-
-            FileUtil.saveBitmap(bitmap2, picture_name);
-
+            FileUtil.saveBitmap(bitmap2, picture_name);/**保存原始帧数据图片*/
             pic_name = pic_name + 1;
             System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssss");
 
