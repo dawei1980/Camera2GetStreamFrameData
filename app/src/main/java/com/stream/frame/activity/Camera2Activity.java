@@ -304,9 +304,9 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             personTracker.personStreamDetect(bitmap2);
             //================================================================================
 
-            String picture_name = pic_name + ".jpg";
-            System.out.println(picture_name);
-            FileUtil.saveBitmap(bitmap2, picture_name);/**保存原始帧数据图片*/
+//            String picture_name = pic_name + ".jpg";
+//            System.out.println(picture_name);
+//            FileUtil.saveBitmap(bitmap2, picture_name);/**保存原始帧数据图片*/
             pic_name = pic_name + 1;
             System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssss");
 
@@ -319,7 +319,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             image.close();
 
             try {
-                Thread.sleep(3000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
