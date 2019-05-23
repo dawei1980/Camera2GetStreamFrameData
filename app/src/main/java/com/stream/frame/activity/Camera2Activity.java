@@ -222,7 +222,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
          * 此处还有很多格式，比如我所用到YUV等
          * 最大的图片数，mImageReader里能获取到图片数，但是实际中是2+1张图片，就是多一张,"30"代表每秒取30帧的图片
          * */
-        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 30);
+        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 40);
 
         mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mHandler);
 
