@@ -61,7 +61,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     private String mCameraId = "0";
 
     public byte[] mImageBytes;
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     private static int mSensorOrientation;
     private static int PREVIEW_WIDTH = 1280;
     private static int PREVIEW_HEIGHT = 720;
@@ -75,13 +74,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     private String logFolder = rootPath +  File.separator + "log";   //the path to save log file
     private PersonTrackerImpl personTracker;
     //==============================================================================================
-
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
