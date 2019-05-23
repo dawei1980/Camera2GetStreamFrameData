@@ -20,6 +20,23 @@ public class AutoFitTextureView extends TextureView {
         super(context, attrs, defStyle);
     }
 
+    /**
+     * 设置宽高比
+     * @param width
+     * @param height
+     */
+    public void setAspectRatio(int width, int height){
+        if (width < 0 || height < 0){
+            throw new IllegalArgumentException("width or height can not be negative.");
+        }
+        //相机输出尺寸宽高默认是横向的，屏幕是竖向时需要反转
+        // （后续适配屏幕旋转时会有更好的方案，这里先这样）
+        mRatioWidth = height;
+        mRatioHeight = width;
+        //请求重新布局
+        requestLayout();
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);

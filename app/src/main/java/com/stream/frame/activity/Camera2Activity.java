@@ -4,9 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -15,6 +17,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.os.Build;
@@ -36,13 +39,18 @@ import android.view.TextureView;
 
 import com.ai.tensorflow.personTracking.PersonTrackerImpl;
 import com.stream.frame.R;
+import com.stream.frame.utils.CameraSizeUtil;
 import com.stream.frame.utils.FileUtil;
 import com.stream.frame.utils.ImageUtil;
 import com.stream.frame.view.AutoFitTextureView;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class Camera2Activity extends AppCompatActivity implements TextureView.SurfaceTextureListener{
@@ -62,10 +70,19 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
     public byte[] mImageBytes;
     private static int mSensorOrientation;
-    private static int PREVIEW_WIDTH = 1280;
-    private static int PREVIEW_HEIGHT = 720;
+    /**
+     * Max preview width that is guaranteed by Camera2 API
+     */
+    private static final int MAX_PREVIEW_WIDTH = 1920;
+
+    /**
+     * Max preview height that is guaranteed by Camera2 API
+     */
+    private static final int MAX_PREVIEW_HEIGHT = 1080;
 
     private int pic_name = 1;
+
+    private Size mVideoSize;
 
     //==============================================================================================
     private String sdcard =  Environment.getExternalStoragePublicDirectory("")+"";
@@ -142,9 +159,80 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             /**获得某个摄像头的特征，支持的参数*/
             CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(mCameraId);
             //支持的STREAM CONFIGURATION
-            mPreviewSize = new Size(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+            //==================================================================================
+            StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            //==================================================================================
+
             mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             Log.e(TAG, "openCamera: ----mSensorOrientation:" + mSensorOrientation);
+
+            //=====================================================================================
+            /**解决预览图像拉伸问题*/
+            // For still image captures, we use the largest available size.
+            Size largest = Collections.max(
+                    Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+                    new CameraSizeUtil.CompareSizesByArea());
+
+            // Find out if we need to swap dimension to get the preview size relative to sensor
+            // coordinate.
+            int displayRotation = getWindowManager().getDefaultDisplay().getRotation();
+            //noinspection ConstantConditions
+            mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+            boolean swappedDimensions = false;
+            switch (displayRotation) {
+                case Surface.ROTATION_0:
+                case Surface.ROTATION_180:
+                    if (mSensorOrientation == 90 || mSensorOrientation == 270) {
+                        swappedDimensions = true;
+                    }
+                    break;
+                case Surface.ROTATION_90:
+                case Surface.ROTATION_270:
+                    if (mSensorOrientation == 0 || mSensorOrientation == 180) {
+                        swappedDimensions = true;
+                    }
+                    break;
+                default:
+                    Log.e(TAG, "Display rotation is invalid: " + displayRotation);
+            }
+
+            Point displaySize = new Point();
+            getWindowManager().getDefaultDisplay().getSize(displaySize);
+            int rotatedPreviewWidth = width;
+            int rotatedPreviewHeight = height;
+            int maxPreviewWidth = displaySize.x;
+            int maxPreviewHeight = displaySize.y;
+
+            if (swappedDimensions) {
+                rotatedPreviewWidth = height;
+                rotatedPreviewHeight = width;
+                maxPreviewWidth = displaySize.y;
+                maxPreviewHeight = displaySize.x;
+            }
+
+            if (maxPreviewWidth > MAX_PREVIEW_WIDTH) {
+                maxPreviewWidth = MAX_PREVIEW_WIDTH;
+            }
+
+            if (maxPreviewHeight > MAX_PREVIEW_HEIGHT) {
+                maxPreviewHeight = MAX_PREVIEW_HEIGHT;
+            }
+
+            // Danger, W.R.! Attempting to use too large a preview size could  exceed the camera
+            // bus' bandwidth limitation, resulting in gorgeous previews but the storage of
+            // garbage capture data.
+            mPreviewSize = CameraSizeUtil.chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
+                    rotatedPreviewWidth, rotatedPreviewHeight, maxPreviewWidth,
+                    maxPreviewHeight, largest);
+
+            // We fit the aspect ratio of TextureView to the size of preview we picked.
+            int orientation = getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mPreviewView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            } else {
+                mPreviewView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
+            }
+            //=====================================================================================
 
             configureTransform(width, height);
 
