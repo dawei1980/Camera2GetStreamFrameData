@@ -40,17 +40,11 @@ import android.view.TextureView;
 import com.ai.tensorflow.personTracking.PersonTrackerImpl;
 import com.stream.frame.R;
 import com.stream.frame.utils.CameraSizeUtil;
-import com.stream.frame.utils.FileUtil;
 import com.stream.frame.utils.ImageUtil;
 import com.stream.frame.view.AutoFitTextureView;
-
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class Camera2Activity extends AppCompatActivity implements TextureView.SurfaceTextureListener{
@@ -195,25 +189,21 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
                 default:
                     Log.e(TAG, "Display rotation is invalid: " + displayRotation);
             }
-
             Point displaySize = new Point();
             getWindowManager().getDefaultDisplay().getSize(displaySize);
             int rotatedPreviewWidth = width;
             int rotatedPreviewHeight = height;
             int maxPreviewWidth = displaySize.x;
             int maxPreviewHeight = displaySize.y;
-
             if (swappedDimensions) {
                 rotatedPreviewWidth = height;
                 rotatedPreviewHeight = width;
                 maxPreviewWidth = displaySize.y;
                 maxPreviewHeight = displaySize.x;
             }
-
             if (maxPreviewWidth > MAX_PREVIEW_WIDTH) {
                 maxPreviewWidth = MAX_PREVIEW_WIDTH;
             }
-
             if (maxPreviewHeight > MAX_PREVIEW_HEIGHT) {
                 maxPreviewHeight = MAX_PREVIEW_HEIGHT;
             }
@@ -341,7 +331,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
                 e.printStackTrace();
             }
         }
-
         @Override
         public void onConfigureFailed(CameraCaptureSession session) {
 
@@ -387,8 +376,8 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 //            String picture_name = pic_name + ".jpg";
 //            System.out.println(picture_name);
 //            FileUtil.saveBitmap(bitmap2, picture_name);/**保存原始帧数据图片*/
-            pic_name = pic_name + 1;
-            System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssss");
+//            pic_name = pic_name + 1;
+//            System.out.println("aaaaaaaaaaaaaaaaaaaaaaaaassssssssssssssssssssssssssss");
 
             // 先判断是否已经回收
             if(bitmap2 != null && !bitmap2.isRecycled()){
@@ -398,11 +387,11 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             System.gc();
             image.close();
 
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         }
     };
 
@@ -434,7 +423,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             mImageReader.close();
             mImageReader = null;
         }
-
         stopBackgroundThread();
 
         //=============================================================
