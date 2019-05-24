@@ -40,6 +40,7 @@ import android.view.TextureView;
 import com.ai.tensorflow.personTracking.PersonTrackerImpl;
 import com.stream.frame.R;
 import com.stream.frame.utils.CameraSizeUtil;
+import com.stream.frame.utils.CompareSizesByArea;
 import com.stream.frame.utils.ImageUtil;
 import com.stream.frame.view.AutoFitTextureView;
 import java.io.File;
@@ -165,7 +166,7 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             // For still image captures, we use the largest available size.
             Size largest = Collections.max(
                     Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-                    new CameraSizeUtil.CompareSizesByArea());
+                    new CompareSizesByArea());
 
             // Find out if we need to swap dimension to get the preview size relative to sensor
             // coordinate.
