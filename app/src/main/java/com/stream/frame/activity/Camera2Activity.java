@@ -145,22 +145,21 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
     }
 
     /**打开相机*/
+    /**open camera*/
     private void openCamera(int width, int height) {
         try {
-            /**获得所有摄像头的管理者CameraManager*/
+            /**Get all cameras of CameraManager*/
             CameraManager cameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-            /**获得某个摄像头的特征，支持的参数*/
+            /**Get the features of a camera and the parameters it supports.*/
             CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(mCameraId);
-            //支持的STREAM CONFIGURATION
-            //==================================================================================
+            /**支持的STREAM CONFIGURATION*/
+            /**Support stream configuration*/
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-            //==================================================================================
 
             mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
             Log.e(TAG, "openCamera: ----mSensorOrientation:" + mSensorOrientation);
 
-            //=====================================================================================
-            /**解决预览图像拉伸问题*/
+            /**Solving the problem of preview image stretching*/
             // For still image captures, we use the largest available size.
             Size largest = Collections.max(
                     Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
@@ -221,7 +220,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
             } else {
                 mPreviewView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
             }
-            //=====================================================================================
 
             configureTransform(width, height);
 
@@ -287,17 +285,21 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
         try {
             /**设置捕获请求为预览，这里还有拍照啊，录像等*/
+            /**Setting get request of preview, and get frame data, photo and record*/
             mPreviewBuilder = camera.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
 
         /**就是在这里，通过这个set(key,value)方法，设置曝光啊，自动聚焦等参数！！ 如下举例：*/
+        /**Through this set (key, value) method, set parameters such as exposure, autofocus, etc.*/
         mPreviewBuilder.set(CaptureRequest.CONTROL_AE_MODE,CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
 
         /**
          * 此处还有很多格式，比如我所用到YUV等
          * 最大的图片数，mImageReader里能获取到图片数，但是实际中是2+1张图片，就是多一张,"30"代表每秒取30帧的图片
+         * There are many formats here, such as YUV and so on
+         *The maximum number of pictures, mImageReader can get the number of pictures, but in reality is 2 + 1 pictures, that is, one more, "30" stands for 30 frames per second of pictures.
          * */
         mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.YUV_420_888, 40);
 
@@ -305,7 +307,9 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
         mPreviewBuilder.set(CaptureRequest.JPEG_ORIENTATION, 0);
 
-        /**这里一定分别add两个surface，一个Textureview的，一个ImageReader的，如果没add，会造成没摄像头预览，或者没有ImageReader的那个回调！！*/
+        /**这里一定分别add两个surface，一个Textureview的，一个ImageReader的，如果没add，会造成没摄像头预览，或者没有ImageReader的那个回调！！
+         * There must be two additional surfaces, one Textureview and one ImageReader. If there is no addition, it will result in no camera preview, or no callback from ImageReader.
+         * */
         mPreviewBuilder.addTarget(surface);
         mPreviewBuilder.addTarget(mImageReader.getSurface());
 
