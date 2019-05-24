@@ -77,8 +77,6 @@ public class Camera2Activity extends AppCompatActivity implements TextureView.Su
 
     private int pic_name = 1;
 
-    private Size mVideoSize;
-
     //==============================================================================================
     private String sdcard =  Environment.getExternalStoragePublicDirectory("")+"";
     // param
